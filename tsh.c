@@ -170,10 +170,19 @@ int main(int argc, char **argv)
  */
 void eval(char *cmdline) 
 {
-	char * argv[MAXARGS];
+	char * argv[MAXARGS];// commend 저장
+	pid_t pid;
 
 	parseline(cmdline, argv);
-	builtin_cmd(argv);
+	
+	if(!builtin_cmd(argv)){
+		if ((pid = safe_fork()) == 0){
+			if (execve(argv[0], argv, environ) < 0) {
+				 printf("%s: Command not found\n", argv[0]);
+				 exit(0);
+			 }
+		}
+	}
 
 	return;
 }
